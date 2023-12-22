@@ -1,0 +1,38 @@
+{
+  "name": "@barchart/serverless-pdf-generator",
+  "version": "3.0.0",
+  "description": "Web service for conversion of HTML to PDF",
+  "contributors": [
+    {
+      "name": "Bryan Ingle",
+      "email": "bryan.ingle@barchart.com"
+    },
+    {
+      "name": "Igor Losev",
+      "email": "igor.losev@barchart.com"
+    }
+  ],
+  "scripts": {
+    "lint": "jshint ./ --exclude './node_modules/**'",
+    "predeploy:stage": "make clean && make all",
+    "predeploy:prod": "make clean && make all",
+    "deploy:stage": "serverless deploy --stage stage",
+    "deploy:prod": "serverless deploy --stage prod",
+    "version": "gulp embed-version"
+  },
+  "dependencies": {
+    "@barchart/common-js": "^4.21.0",
+    "@barchart/common-node-js": "^4.21.0",
+    "@barchart/log4js-node-appenders": "^1.1.5",
+    "@sparticuz/chromium": "116.0.0",
+    "puppeteer-core": "21.1.1",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-replace": "^0.5.4",
+    "puppeteer": "21.1.1"
+  },
+  "license": "MIT",
+  "private": true
+}

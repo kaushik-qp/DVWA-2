@@ -1,0 +1,9 @@
+.idea
+.serverless
+.webpack
+node_modules
+out.pdf
+
+chrome-aws-lambda
+
+layers

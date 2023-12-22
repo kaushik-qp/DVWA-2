@@ -1,0 +1,100 @@
+openapi: 3.0.1
+
+info:
+  title: PDF generator API
+  description: PDF generator API
+  version: 2.1.0
+
+components:
+  responses:
+    Success:
+      description: Generated PDF file.
+      content:
+        application/pdf:
+          schema:
+            type: string
+            format: binary
+
+    BadRequest:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                value:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: PRINT_FAILED_NO_HTML_LAYOUT
+                    message:
+                      type: string
+                      example: Failed to print PDF, missing html layout.
+                children:
+                  type: array
+                  example: []
+                  items: {}
+
+    ServerError:
+      description: Server error.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                value:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      example: REQUEST_GENERAL_FAILURE
+                    message:
+                      type: string
+                      example: An attempt to print html page failed for unspecified reason(s).
+                children:
+                  type: array
+                  example: []
+                  items: {}
+
+tags:
+  - name: Pdf
+
+paths:
+  /print:
+    post:
+      summary: Prints PDF page from html layout (chrome v92 by default).
+      description: Prints PDF page from html layout (chrome v92 by default).
+      tags:
+        - Pdf
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: string
+                  description: Optional string to define the source of request
+                  example: crude-oil-price-report
+                html:
+                  type: string
+                  description: HTML layout to print
+                  example: '<html><head></head><body>test</body></html>'
+                settings:
+                  type: object
+                  description: 'Optional [settings](https://github.com/puppeteer/puppeteer/blob/v5.2.1/docs/api.md#pagepdfoptions) passed to page.pdf()'
+                  example: { width: '100px' }
+              required:
+                - html
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/ServerError'

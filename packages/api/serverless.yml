@@ -1,0 +1,95 @@
+service: serverless-pdf-generator
+
+frameworkVersion: ">=3.27.0 <4.0.0"
+
+custom:
+  stage: ${opt:stage, 'stage'}
+
+  s3:
+    responseRegion: 'us-east-1'
+    responseBucket: 'barchart-aws-lambda-responses'
+
+  cors:
+    origin: '*'
+    headers:
+      - Accept-Encoding
+      - Content-Type
+      - Content-Length
+      - X-Amz-Date
+      - Authorization
+      - X-Api-Key
+      - X-Amz-Security-Token
+      - X-Amz-User-Agent
+      - Access-Control-Allow-Origin
+      - Access-Control-Allow-Headers
+      - Access-Control-Allow-Methods
+    allowCredentials: false
+
+  apigwBinary:
+    types:
+      - '*/*'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  logRetentionInDays: 90
+  deploymentBucket: barchart-serverless-deployments
+
+  environment:
+    NODE_ENV: ${self:custom.stage}
+    S3_LARGE_HTTP_RESPONSE_REGION: ${self:custom.s3.responseRegion}
+    S3_LARGE_HTTP_RESPONSE_BUCKET: ${self:custom.s3.responseBucket}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+          Resource: arn:aws:s3:::${self:custom.s3.responseBucket}/*
+
+  apiGateway:
+    shouldStartNameWithService: true
+
+package:
+  individually: true
+
+layers:
+  HeadlessChromium:
+    name: serverless-headless-chromium-${self:custom.stage}-v116
+    description: Layer for puppeteer to launch headless Chromium v116
+    compatibleRuntimes:
+      - nodejs18.x
+    package:
+      artifact: layers/chromium-v116.zip
+
+functions:
+  print:
+    handler: print/print.handler
+    description: Generates a PDF from HTML (using Chromium v116)
+    memorySize: 2048
+    timeout: 30
+    layers:
+      - { Ref: HeadlessChromiumLambdaLayer }
+    events:
+      - http:
+          path: /print
+          method: POST
+          cors: ${self:custom.cors}
+
+  serviceRead:
+    handler: service/version.handler
+    description: Reads service metadata
+    events:
+      - http:
+          method: GET
+          path: service/version
+          cors: ${self:custom.cors}
+
+resources:
+  Description: API for generating PDF from HTML
+
+plugins:
+  - serverless-webpack
+  - serverless-apigw-binary

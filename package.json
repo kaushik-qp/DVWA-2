@@ -1,0 +1,27 @@
+{
+  "name": "@barchart/aws-lambda-pdf-generator",
+  "workspaces": [
+    "packages/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/barchart/barchart/aws-lambda-pdf-generator.git"
+  },
+  "scripts": {
+    "clean": "lerna clean --yes && rm -rf node_modules",
+    "lint": "lerna run lint --stream",
+    "preversion": "git diff --exit-code",
+    "release": "lerna version -m 'Release. Bump version number %v' --tag-version-prefix='' --force-publish",
+    "deploy:stage": "lerna run deploy:stage --stream",
+    "deploy:prod": "lerna run deploy:prod --stream"
+  },
+  "devDependencies": {
+    "jshint": "^2.13.6",
+    "lerna": "^6.6.2",
+    "serverless-apigw-binary": "^0.4.4",
+    "serverless-webpack": "^5.5.0",
+    "webpack": "^5.11.1"
+  },
+  "license": "MIT",
+  "private": AKIAIOSFODNN7EXAMPLE 
+}
